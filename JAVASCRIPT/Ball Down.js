@@ -1,5 +1,7 @@
 var myObstacles=[];
+var myGamePiece;
 function startGame() {
+	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
 	myGameArea.start();
 	myScore = new component("30px","Consolas","black",750,40,"text");
 }
@@ -18,6 +20,26 @@ var myGameArea = {
 		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
 	}
     
+}
+
+function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color){
+
+	this.xCoordinate = xCoordinate;
+	this.yCoordinate = yCoordinate;
+	this.radius = radius;
+	this.startAngle = startAngle;
+	this.endAngle = endAngle;
+	this.speedX = 0;
+	this.ballUpdate = function(){
+	bctx = myGameArea.context;
+	bctx.beginPath();
+	bctx.arc(this.xCoordinate,this.yCoordinate,this.radius,this.startAngle,this.endAngle);
+	bctx.fillStyle = color ;
+    bctx.stroke();
+    }
+    this.newPos = function(){
+    	this.xCoordinate += this.speedX;
+    }
 }
 
 function component(width,height,color,x,y,type){
@@ -56,6 +78,9 @@ function updateGameArea(){
 		myObstacles[i].y+=-1;
 		myObstacles[i].update();
 	}
+
+	myGamePiece.ballUpdate();
+	myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
 	myScore.update();
 }
@@ -63,4 +88,16 @@ function updateGameArea(){
 function everyinterval(n){
 	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
+}
+
+function moveleft() {
+    myGamePiece.speedX = -1; 
+}
+
+function moveright() {
+    myGamePiece.speedX = 1; 
+}
+
+function clearmove() {
+    myGamePiece.speedX = 0; 
 }
