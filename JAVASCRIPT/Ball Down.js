@@ -15,7 +15,7 @@ var myGameArea = {
 	},
 	clear : function() {
 		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
-	},
+	}
     
 }
 
@@ -32,13 +32,18 @@ function component(width,height,color,x,y){
 }
 
 function updateGameArea(){
-	var x,y;
+	var y,lineWidth,gap,minWidth,maxWidth,x;
 	myGameArea.clear();
-	myGameArea.frameNo +=1;
+	myGameArea.frameNo+=1;
 	if(myGameArea.frameNo==1||everyinterval(150)) {
-		x=myGameArea.canvas.width-700;
 		y=myGameArea.canvas.height;
-		myObstacles.push(new component(400,10,"blue",x,y));
+		x=myGameArea.canvas.width;
+		minWidth=20;
+		maxWidth=600;
+		lineWidth=Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+        gap = 140;
+		myObstacles.push(new component(lineWidth,10,"blue",0,y));
+		myObstacles.push(new component((x-lineWidth-gap),10,"blue",(lineWidth+gap),y));
 	}
 	for(i=0;i<myObstacles.length; i+=1){
 		myObstacles[i].y+=-1;
