@@ -1,5 +1,5 @@
+var myObstacles=[];
 function startGame() {
-	myObstacles=[];
 	myGameArea.start();
 }
 
@@ -38,8 +38,8 @@ function updateGameArea(){
 	if(myGameArea.frameNo==1||everyinterval(150)) {
 		y=myGameArea.canvas.height;
 		x=myGameArea.canvas.width;
-		minWidth=20;
-		maxWidth=600;
+		minWidth=0;
+		maxWidth=820;
 		lineWidth=Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
         gap = 140;
 		myObstacles.push(new component(lineWidth,10,"blue",0,y));
