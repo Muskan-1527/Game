@@ -53,6 +53,6 @@ function updateGameArea(){
 }
 
 function everyinterval(n){
-	if((myGameArea.frameNo / n)%1==0) {return true;}
+	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
 }
