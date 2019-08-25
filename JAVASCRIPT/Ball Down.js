@@ -1,4 +1,3 @@
-
 var myObstacles=[];
 var widthStore=[];
 var myGamePiece;
@@ -25,7 +24,7 @@ var myGameArea = {
 	},
 		stop : function(){
 		clearInterval(this.interval);
-		alert("GameOver")
+		alert("SCORE : "+myGameArea.frameNo+"\n  GAME OVER");
 	}
     
 }
@@ -38,7 +37,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;
 	this.speedX = 0;
-	this.gravity = 6;
+	this.gravity = 2;
 	this.ballUpdate = function(){
 	bctx = myGameArea.context;
 	bctx.beginPath();
@@ -49,6 +48,12 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
     this.newPos = function(){
         this.yCoordinate +=this.gravity;
     	this.xCoordinate += this.speedX;
+    	if(this.xCoordinate-this.radius<0){
+    		this.xCoordinate=this.radius;
+    	}
+    	if(this.xCoordinate+this.radius>myGameArea.canvas.width){
+    		this.xCoordinate=myGameArea.canvas.width-this.radius;
+    	}
     	this.hitObstaclesLeft();
     	this.hitObstaclesRight();
     }
@@ -73,7 +78,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	}
 
      this.crashWith = function(){
-     	if(this.yCoordinate+this.radius>myGameArea.canvas.height)
+     	if(this.yCoordinate-this.radius>myGameArea.canvas.height)
      		return true;
      	else if(this.yCoordinate+this.radius<0)
      		return true;
