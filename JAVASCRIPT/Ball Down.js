@@ -1,5 +1,8 @@
+
 var myObstacles=[];
+var widthStore=[];
 var myGamePiece;
+var k=0;
 function startGame() {
 	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
 	myGameArea.start();
@@ -30,6 +33,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;
 	this.speedX = 0;
+	this.gravity = 2.5;
 	this.ballUpdate = function(){
 	bctx = myGameArea.context;
 	bctx.beginPath();
@@ -38,8 +42,21 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
     bctx.stroke();
     }
     this.newPos = function(){
+        this.yCoordinate +=this.gravity;
     	this.xCoordinate += this.speedX;
+    	this.hitObstacles();
     }
+
+    	this.hitObstacles = function(){
+		var rockObstacles = myObstacles[0].y;
+		if(this.yCoordinate+this.radius>rockObstacles){
+			if(this.xCoordinate<widthStore[0]+this.radius){
+				this.yCoordinate=rockObstacles-this.radius;
+			}
+		}
+        
+	}
+
 }
 
 function component(width,height,color,x,y,type){
@@ -70,6 +87,8 @@ function updateGameArea(){
 		minWidth=0;
 		maxWidth=820;
 		lineWidth=Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+		widthStore[k] = lineWidth;
+		k=k+1;
         gap = 140;
 		myObstacles.push(new component(lineWidth,10,"blue",0,y));
 		myObstacles.push(new component((x-lineWidth-gap),10,"blue",(lineWidth+gap),y));
@@ -80,10 +99,12 @@ function updateGameArea(){
 	}
 
 	myGamePiece.ballUpdate();
-	myGamePiece.newPos();
+    myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
 	myScore.update();
 }
+
+
 
 function everyinterval(n){
 	if(myGameArea.frameNo % n==0) {return true;}
@@ -91,11 +112,11 @@ function everyinterval(n){
 }
 
 function moveleft() {
-    myGamePiece.speedX = -1; 
+    myGamePiece.speedX = -3; 
 }
 
 function moveright() {
-    myGamePiece.speedX = 1; 
+    myGamePiece.speedX = 3; 
 }
 
 function clearmove() {
