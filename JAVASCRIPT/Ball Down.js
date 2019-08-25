@@ -3,6 +3,7 @@ var myObstacles=[];
 var widthStore=[];
 var myGamePiece;
 var k=0;
+var myBackground;
 function startGame() {
 	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
 	myGameArea.start();
@@ -21,6 +22,10 @@ var myGameArea = {
 	},
 	clear : function() {
 		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+	},
+		stop : function(){
+		clearInterval(this.interval);
+		alert("GameOver")
 	}
     
 }
@@ -33,7 +38,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;
 	this.speedX = 0;
-	this.gravity = 2.5;
+	this.gravity = 6;
 	this.ballUpdate = function(){
 	bctx = myGameArea.context;
 	bctx.beginPath();
@@ -44,18 +49,36 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
     this.newPos = function(){
         this.yCoordinate +=this.gravity;
     	this.xCoordinate += this.speedX;
-    	this.hitObstacles();
+    	this.hitObstaclesLeft();
+    	this.hitObstaclesRight();
     }
 
-    	this.hitObstacles = function(){
+    	this.hitObstaclesLeft = function(){
 		var rockObstacles = myObstacles[0].y;
-		if(this.yCoordinate+this.radius>rockObstacles){
+		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
 			if(this.xCoordinate<widthStore[0]+this.radius){
 				this.yCoordinate=rockObstacles-this.radius;
 			}
 		}
         
 	}
+
+	this.hitObstaclesRight = function(){
+		var rockObstacles = myObstacles[1].y;
+		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
+			if(this.xCoordinate>widthStore[0]+140){
+				this.yCoordinate=rockObstacles-this.radius;
+			}
+		}
+	}
+
+     this.crashWith = function(){
+     	if(this.yCoordinate+this.radius>myGameArea.canvas.height)
+     		return true;
+     	else if(this.yCoordinate+this.radius<0)
+     		return true;
+
+     }
 
 }
 
@@ -79,6 +102,9 @@ function component(width,height,color,x,y,type){
 
 function updateGameArea(){
 	var y,lineWidth,gap,minWidth,maxWidth,x;
+	if(myGamePiece.crashWith()){
+		myGameArea.stop();
+	}
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
 	if(myGameArea.frameNo==1||everyinterval(150)) {
