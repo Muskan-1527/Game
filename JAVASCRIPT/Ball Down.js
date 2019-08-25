@@ -1,7 +1,17 @@
+var myObstacles=[];
+var widthStore=[];
+var myGamePiece;
+var k=0;
+var myBackground;
+var mySound;
+var myMusic;
 function startGame() {
-	myObstacles=[];
+	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
 	myGameArea.start();
 	myScore = new component("30px","Consolas","black",750,40,"text");
+	mySound = new sound("drop_message.mp3");
+	myMusic = new sound("got_music_box_theme.mp3");
+	myMusic.play();
 }
 
 var myGameArea = {
@@ -16,8 +26,70 @@ var myGameArea = {
 	},
 	clear : function() {
 		this.context.clearRect(0,0,this.canvas.width,this.canvas.height);
+	},
+		stop : function(){
+		clearInterval(this.interval);
+		alert("SCORE : "+myGameArea.frameNo+"\n  GAME OVER");
 	}
     
+}
+
+function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color){
+
+	this.xCoordinate = xCoordinate;
+	this.yCoordinate = yCoordinate;
+	this.radius = radius;
+	this.startAngle = startAngle;
+	this.endAngle = endAngle;
+	this.speedX = 0;
+	this.gravity = 8;
+	this.ballUpdate = function(){
+	bctx = myGameArea.context;
+	bctx.beginPath();
+	bctx.arc(this.xCoordinate,this.yCoordinate,this.radius,this.startAngle,this.endAngle);
+	bctx.fillStyle = color ;
+    bctx.stroke();
+    }
+    this.newPos = function(){
+        this.yCoordinate +=this.gravity;
+    	this.xCoordinate += this.speedX;
+    	if(this.xCoordinate-this.radius<0){
+    		this.xCoordinate=this.radius;
+    	}
+    	if(this.xCoordinate+this.radius>myGameArea.canvas.width){
+    		this.xCoordinate=myGameArea.canvas.width-this.radius;
+    	}
+    	this.hitObstaclesLeft();
+    	this.hitObstaclesRight();
+    }
+
+    	this.hitObstaclesLeft = function(){
+		var rockObstacles = myObstacles[0].y;
+		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
+			if(this.xCoordinate<widthStore[0]+this.radius){
+				this.yCoordinate=rockObstacles-this.radius;
+			}
+		}
+        
+	}
+
+	this.hitObstaclesRight = function(){
+		var rockObstacles = myObstacles[1].y;
+		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
+			if(this.xCoordinate>widthStore[0]+140){
+				this.yCoordinate=rockObstacles-this.radius;
+			}
+		}
+	}
+
+     this.crashWith = function(){
+     	if(this.yCoordinate-this.radius>myGameArea.canvas.height)
+     		return true;
+     	else if(this.yCoordinate+this.radius<0)
+     		return true;
+
+     }
+
 }
 
 function component(width,height,color,x,y,type){
@@ -40,14 +112,21 @@ function component(width,height,color,x,y,type){
 
 function updateGameArea(){
 	var y,lineWidth,gap,minWidth,maxWidth,x;
+	if(myGamePiece.crashWith()){
+		myGameArea.stop();
+		mySound.play();
+		myMusic.stop();
+	}
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
 	if(myGameArea.frameNo==1||everyinterval(150)) {
 		y=myGameArea.canvas.height;
 		x=myGameArea.canvas.width;
-		minWidth=20;
-		maxWidth=600;
+		minWidth=0;
+		maxWidth=820;
 		lineWidth=Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
+		widthStore[k] = lineWidth;
+		k=k+1;
         gap = 140;
 		myObstacles.push(new component(lineWidth,10,"blue",0,y));
 		myObstacles.push(new component((x-lineWidth-gap),10,"blue",(lineWidth+gap),y));
@@ -56,11 +135,42 @@ function updateGameArea(){
 		myObstacles[i].y+=-1;
 		myObstacles[i].update();
 	}
+
+	myGamePiece.ballUpdate();
+    myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
 	myScore.update();
 }
 
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
+
+
 function everyinterval(n){
 	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
+}
+
+function moveleft() {
+    myGamePiece.speedX = -8; 
+}
+
+function moveright() {
+    myGamePiece.speedX = 8; 
+}
+
+function clearmove() {
+    myGamePiece.speedX = 0; 
 }
