@@ -3,10 +3,15 @@ var widthStore=[];
 var myGamePiece;
 var k=0;
 var myBackground;
+var mySound;
+var myMusic;
 function startGame() {
 	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
 	myGameArea.start();
 	myScore = new component("30px","Consolas","black",750,40,"text");
+	mySound = new sound("drop_message.mp3");
+	myMusic = new sound("got_music_box_theme.mp3");
+	myMusic.play();
 }
 
 var myGameArea = {
@@ -37,7 +42,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;
 	this.speedX = 0;
-	this.gravity = 2;
+	this.gravity = 4;
 	this.ballUpdate = function(){
 	bctx = myGameArea.context;
 	bctx.beginPath();
@@ -109,6 +114,8 @@ function updateGameArea(){
 	var y,lineWidth,gap,minWidth,maxWidth,x;
 	if(myGamePiece.crashWith()){
 		myGameArea.stop();
+		mySound.play();
+		myMusic.stop();
 	}
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
@@ -129,27 +136,45 @@ function updateGameArea(){
 		myObstacles[i].update();
 	}
 
+	addEventListener('keyup', function (e) {
+            myGameArea.key = false;
+            myGamePiece.speedX=0;
+        })
+    addEventListener('keydown', function (e) {
+            myGameArea.key = e.keyCode;
+        })
+
+	if (myGameArea.key && myGameArea.key == 37) {
+		myGamePiece.speedX = -4; 
+	}
+    if (myGameArea.key && myGameArea.key == 39) {
+    	myGamePiece.speedX = 4;
+    }
+
 	myGamePiece.ballUpdate();
     myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
 	myScore.update();
 }
 
-
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
 
 function everyinterval(n){
 	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
 }
 
-function moveleft() {
-    myGamePiece.speedX = -3; 
-}
 
-function moveright() {
-    myGamePiece.speedX = 3; 
-}
-
-function clearmove() {
-    myGamePiece.speedX = 0; 
-}
