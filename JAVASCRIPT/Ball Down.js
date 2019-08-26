@@ -12,6 +12,7 @@ function startGame() {
 	mySound = new sound("drop_message.mp3");
 	myMusic = new sound("got_music_box_theme.mp3");
 	myMusic.play();
+
 }
 
 var myGameArea = {
@@ -42,7 +43,7 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	this.startAngle = startAngle;
 	this.endAngle = endAngle;
 	this.speedX = 0;
-	this.gravity = 8;
+	this.gravity = 4;
 	this.ballUpdate = function(){
 	bctx = myGameArea.context;
 	bctx.beginPath();
@@ -59,28 +60,38 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
     	if(this.xCoordinate+this.radius>myGameArea.canvas.width){
     		this.xCoordinate=myGameArea.canvas.width-this.radius;
     	}
-    	this.hitObstaclesLeft();
-    	this.hitObstaclesRight();
+
     }
 
-    	this.hitObstaclesLeft = function(){
-		var rockObstacles = myObstacles[0].y;
-		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
-			if(this.xCoordinate<widthStore[0]+this.radius){
-				this.yCoordinate=rockObstacles-this.radius;
-			}
-		}
-        
-	}
+    this.hitWithObstaclesLeft = function(otherobj){
+    	var myleft = this.xCoordinate-(this.radius);
+    	var mytop = this.yCoordinate-(this.radius);
+    	var mybottom = this.yCoordinate + (this.radius);
+    	var otherright = otherobj.x+(otherobj.width);
+    	var othertop = otherobj.y;
+    	var otherbottom = otherobj.y + (otherobj.height);
+    	var crash = true;
+    	if((mybottom < othertop) || (mybottom > otherbottom) || (myleft > otherright)) {
+	       crash = false;
+         }
 
-	this.hitObstaclesRight = function(){
-		var rockObstacles = myObstacles[1].y;
-		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
-			if(this.xCoordinate>widthStore[0]+140){
-				this.yCoordinate=rockObstacles-this.radius;
-			}
-		}
-	}
+         return crash;
+    }
+
+    this.hitWithObstaclesRight = function(otherobj){
+        var myright = this.xCoordinate + (this.radius);
+    	var mytop = this.yCoordinate-(this.radius);
+    	var mybottom = this.yCoordinate + (this.radius);
+    	var otherleft = otherobj.x;
+    	var othertop = otherobj.y;
+    	var otherbottom = otherobj.y + (otherobj.height);
+    	var crash = true;
+    	if((mybottom < othertop) || (mybottom > otherbottom) || (myright < otherleft)) {
+	       crash = false;
+         }
+
+         return crash;
+    }
 
      this.crashWith = function(){
      	if(this.yCoordinate-this.radius>myGameArea.canvas.height)
@@ -117,6 +128,24 @@ function updateGameArea(){
 		mySound.play();
 		myMusic.stop();
 	}
+
+    for(i = 0; i < myObstacles.length ; i += 1)
+    {
+    	if(i%2==0)
+    	{
+    		if(myGamePiece.hitWithObstaclesLeft(myObstacles[i])){
+    		myGamePiece.yCoordinate = myObstacles[i].y-myGamePiece.radius;
+    	   }
+    	}
+
+    	else
+    	{
+    		if(myGamePiece.hitWithObstaclesRight(myObstacles[i])){
+    		myGamePiece.yCoordinate = myObstacles[i].y-myGamePiece.radius;
+    	  }
+    	}
+    }
+	
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
 	if(myGameArea.frameNo==1||everyinterval(150)) {
@@ -136,6 +165,21 @@ function updateGameArea(){
 		myObstacles[i].update();
 	}
 
+	addEventListener('keyup', function (e) {
+            myGameArea.key = false;
+            myGamePiece.speedX=0;
+        })
+    addEventListener('keydown', function (e) {
+            myGameArea.key = e.keyCode;
+        })
+
+	if (myGameArea.key && myGameArea.key == 37) {
+		myGamePiece.speedX = -4; 
+	}
+    if (myGameArea.key && myGameArea.key == 39) {
+    	myGamePiece.speedX = 4;
+    }
+
 	myGamePiece.ballUpdate();
     myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
@@ -145,8 +189,8 @@ function updateGameArea(){
 function sound(src) {
     this.sound = document.createElement("audio");
     this.sound.src = src;
-    this.sound.setAttribute("preload", "auto");
-    this.sound.setAttribute("controls", "none");
+    this.sound.setAttribute("preload", "none");
+    this.sound.setAttribute("preload", "none");
     this.sound.style.display = "none";
     document.body.appendChild(this.sound);
     this.play = function(){
@@ -157,20 +201,7 @@ function sound(src) {
     }    
 }
 
-
 function everyinterval(n){
-	if(myGameArea.frameNo % n==0) {return true;}
+   	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
-}
-
-function moveleft() {
-    myGamePiece.speedX = -8; 
-}
-
-function moveright() {
-    myGamePiece.speedX = 8; 
-}
-
-function clearmove() {
-    myGamePiece.speedX = 0; 
 }
