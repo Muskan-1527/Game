@@ -59,28 +59,38 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
     	if(this.xCoordinate+this.radius>myGameArea.canvas.width){
     		this.xCoordinate=myGameArea.canvas.width-this.radius;
     	}
-    	this.hitObstaclesLeft();
-    	this.hitObstaclesRight();
+
     }
 
-    	this.hitObstaclesLeft = function(){
-		var rockObstacles = myObstacles[0].y;
-		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
-			if(this.xCoordinate<widthStore[0]+this.radius){
-				this.yCoordinate=rockObstacles-this.radius;
-			}
-		}
-        
-	}
+    this.hitWithObstaclesLeft = function(otherobj){
+    	var myleft = this.xCoordinate-(this.radius);
+    	var mytop = this.yCoordinate-(this.radius);
+    	var mybottom = this.yCoordinate + (this.radius);
+    	var otherright = otherobj.x+(otherobj.width);
+    	var othertop = otherobj.y;
+    	var otherbottom = otherobj.y + (otherobj.height);
+    	var crash = true;
+    	if((mybottom < othertop) || (mytop > otherbottom) || (myleft > otherright)) {
+	       crash = false;
+         }
 
-	this.hitObstaclesRight = function(){
-		var rockObstacles = myObstacles[1].y;
-		if(this.yCoordinate+this.radius>rockObstacles && this.yCoordinate+this.radius<rockObstacles + 10){
-			if(this.xCoordinate>widthStore[0]+140){
-				this.yCoordinate=rockObstacles-this.radius;
-			}
-		}
-	}
+         return crash;
+    }
+
+    this.hitWithObstaclesRight = function(otherobj){
+        var myright = this.xCoordinate + (this.radius);
+    	var mytop = this.yCoordinate-(this.radius);
+    	var mybottom = this.yCoordinate + (this.radius);
+    	var otherleft = otherobj.x;
+    	var othertop = otherobj.y;
+    	var otherbottom = otherobj.y + (otherobj.height);
+    	var crash = true;
+    	if((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft)) {
+	       crash = false;
+         }
+
+         return crash;
+    }
 
      this.crashWith = function(){
      	if(this.yCoordinate-this.radius>myGameArea.canvas.height)
@@ -117,6 +127,24 @@ function updateGameArea(){
 		mySound.play();
 		myMusic.stop();
 	}
+
+    for(i = 0; i < myObstacles.length ; i += 1)
+    {
+    	if(i%2==0)
+    	{
+    		if(myGamePiece.hitWithObstaclesLeft(myObstacles[i])){
+    		myGamePiece.yCoordinate = myObstacles[i].y-myGamePiece.radius;
+    	   }
+    	}
+
+    	else
+    	{
+    		if(myGamePiece.hitWithObstaclesRight(myObstacles[i])){
+    		myGamePiece.yCoordinate = myObstacles[i].y-myGamePiece.radius;
+    	  }
+    	}
+    }
+	
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
 	if(myGameArea.frameNo==1||everyinterval(150)) {
