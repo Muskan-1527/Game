@@ -1,18 +1,11 @@
 var myObstacles=[];
-var widthStore=[];
 var myGamePiece;
 var k=0;
 var myBackground;
-var mySound;
-var myMusic;
 function startGame() {
-	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI,"blue");
+	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI);
 	myGameArea.start();
 	myScore = new component("30px","Consolas","black",750,40,"text");
-	mySound = new sound("drop_message.mp3");
-	myMusic = new sound("got_music_box_theme.mp3");
-	myMusic.play();
-
 }
 
 var myGameArea = {
@@ -35,7 +28,7 @@ var myGameArea = {
     
 }
 
-function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color){
+function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle){
 
 	this.xCoordinate = xCoordinate;
 	this.yCoordinate = yCoordinate;
@@ -48,7 +41,6 @@ function ballComponent(xCoordinate,yCoordinate,radius,startAngle,endAngle,color)
 	bctx = myGameArea.context;
 	bctx.beginPath();
 	bctx.arc(this.xCoordinate,this.yCoordinate,this.radius,this.startAngle,this.endAngle);
-	bctx.fillStyle = color ;
     bctx.stroke();
     }
     this.newPos = function(){
@@ -125,8 +117,6 @@ function updateGameArea(){
 	var y,lineWidth,gap,minWidth,maxWidth,x;
 	if(myGamePiece.crashWith()){
 		myGameArea.stop();
-		mySound.play();
-		myMusic.stop();
 	}
 
     for(i = 0; i < myObstacles.length ; i += 1)
@@ -154,8 +144,6 @@ function updateGameArea(){
 		minWidth=0;
 		maxWidth=820;
 		lineWidth=Math.floor(Math.random()*(maxWidth-minWidth+1)+minWidth);
-		widthStore[k] = lineWidth;
-		k=k+1;
         gap = 140;
 		myObstacles.push(new component(lineWidth,10,"blue",0,y));
 		myObstacles.push(new component((x-lineWidth-gap),10,"blue",(lineWidth+gap),y));
@@ -186,20 +174,6 @@ function updateGameArea(){
 	myScore.update();
 }
 
-function sound(src) {
-    this.sound = document.createElement("audio");
-    this.sound.src = src;
-    this.sound.setAttribute("preload", "none");
-    this.sound.setAttribute("preload", "none");
-    this.sound.style.display = "none";
-    document.body.appendChild(this.sound);
-    this.play = function(){
-        this.sound.play();
-    }
-    this.stop = function(){
-        this.sound.pause();
-    }    
-}
 
 function everyinterval(n){
    	if(myGameArea.frameNo % n==0) {return true;}
