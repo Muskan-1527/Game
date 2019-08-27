@@ -147,7 +147,7 @@ function updateGameArea(){
 	
 	myGameArea.clear();
 	myGameArea.frameNo+=1;
-	if(myGameArea.frameNo==1||everyinterval(150)) {
+	if(myGameArea.frameNo==1||everyinterval(100)) {
 		y=myGameArea.canvas.height;
 		x=myGameArea.canvas.width;
 		minWidth=0;
