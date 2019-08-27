@@ -1,11 +1,14 @@
 var myObstacles=[];
 var myGamePiece;
 var k=0;
-var myBackground;
+var mySound;
+var myScore;
 function startGame() {
 	myGamePiece = new ballComponent(95,50,40,0,2*Math.PI);
 	myGameArea.start();
 	myScore = new component("30px","Consolas","black",750,40,"text");
+	mySound = new sound("drop_message.mp3");
+
 }
 
 var myGameArea = {
@@ -116,6 +119,7 @@ function component(width,height,color,x,y,type){
 function updateGameArea(){
 	var y,lineWidth,gap,minWidth,maxWidth,x;
 	if(myGamePiece.crashWith()){
+		mySound.play();
 		myGameArea.stop();
 	}
 
@@ -167,7 +171,6 @@ function updateGameArea(){
     if (myGameArea.key && myGameArea.key == 39) {
     	myGamePiece.speedX = 4;
     }
-
 	myGamePiece.ballUpdate();
     myGamePiece.newPos();
 	myScore.text = "SCORE:" + myGameArea.frameNo;
@@ -175,6 +178,19 @@ function updateGameArea(){
 }
 
 
+function sound(src) {
+	this.sound = document.createElement("audio");
+	this.sound.src =src;
+	this.sound.setAttribute("preload", "auto");
+	this.sound.setAttribute("control", "none");
+	document.body.appendChild(this.sound);
+	this.play = function() {
+		this.sound.play();
+	}
+	this.stop = function() {
+		this.sound.pause();
+	}
+}
 function everyinterval(n){
    	if(myGameArea.frameNo % n==0) {return true;}
 	return false;
