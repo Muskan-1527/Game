@@ -26,7 +26,7 @@ var myGameArea = {
 	},
 		stop : function(){
 		clearInterval(this.interval);
-		alert("SCORE : "+myGameArea.frameNo+"\n  GAME OVER");
+		alert("SCORE : "+ parseInt((myGameArea.frameNo)/100) +"\n  GAME OVER");
 	}
     
 }
@@ -173,7 +173,7 @@ function updateGameArea(){
     }
 	myGamePiece.ballUpdate();
     myGamePiece.newPos();
-	myScore.text = "SCORE:" + myGameArea.frameNo;
+	myScore.text = "SCORE:" + parseInt((myGameArea.frameNo)/100);
 	myScore.update();
 }
 
